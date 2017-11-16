@@ -10,13 +10,12 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
 {
      private Node<K, V>[] dict;
      private int numOfItems;
-     private int nSize;
     
      public DictionaryHashTable()
      {
          this(5); //default to 5
      }
-    
+     
      public DictionaryHashTable(int size)
      {
          @SuppressWarnings("unchecked")
@@ -28,7 +27,38 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
          }
          numOfItems = 0;
      }
-    
+     
+     /** Returns the index at which to place the given key.
+      *  @param key  The key at which to retrieve the index. */
+     public int index(K key)
+     {
+         return key.hashCode() % dict.length;
+     }
+     
+     public boolean isPrime(int num)
+     {
+         for (int i=2; i<Math.sqrt(num); i++)
+         {
+             if (num % i == 0) //if num divisible by any [2 through ?num]
+             {
+                 return false;
+             }
+         }
+         return true;
+     }
+     
+     /** Returns the next prime number at least double the size of the current dict size.
+      *  @return The next prime at least double current dict size. */
+     public int nextPrime()
+     {
+         int newSize = dict.length * 2 + 1;
+         while (!isPrime(newSize))
+         {
+             newSize++;
+         }
+         return newSize;
+     }
+     
      /** Adds a new entry to this dictionary. If the given search key already
        exists in the dictionary, replaces the corresponding value.
        @param key    An object search key of the new entry.
@@ -38,24 +68,42 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
                 was replaced. */
      public V add(K key, V value)
      {
-         int hash = key.hashCode() % dict.length;
-         Node tNode = new Node(key, value);
-         //while loop to incriment hash until hash fully loops and finds the open spot 
-         while(numOfItems < dict.length)
+         if (contains(key)) //if key in dict, replace it
          {
-            // if there is no node at all simply add
-             if(numOfItems == 0)
+             V tempVal = getValue(key);
+             int i = index(key);
+             while (!dict[i].getKey().equals(key)) //while Node not same key
              {
-                 dict[hash] = tNode;
-                 numOfItems++;
-                 return null;
+                 i = i+1 % dict.length;
              }
+             dict[i].setValue(value);
+             return tempVal;
          }
-         // if array is full, double size and attempt to find next prime
-         if(numOfItems == dict.length)
+         else if (numOfItems == dict.length) //if dict full, resize, then add
          {
-             nSize = dict.length * 2;
-             // next prime number found here and new array created
+             Node<K, V>[] tempDict = dict;
+             @SuppressWarnings("unchecked")
+             Node<K, V>[] newDict = (Node<K, V>[])new Node<?,?>[nextPrime()];
+             dict = newDict;
+             for (int i=0; i<dict.length; i++)
+             {
+                 if (dict[i].getKey() != null)
+                 {
+                     add(dict[i].getKey(), dict[i].getValue()); //add all nodes to new, bigger dict
+                 }
+             }
+             add(key, value);
+         }
+         else //key not inside and dict not full, so add
+         {
+             int i = index(key);
+             while (dict[i].getKey() != null) //while Node not open
+             {
+                 i = i+1 % dict.length;
+             }
+             dict[i].setKey(key);
+             dict[i].setValue(value);
+             numOfItems++;
          }
          return null;
      }
