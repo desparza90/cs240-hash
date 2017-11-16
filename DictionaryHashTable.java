@@ -114,7 +114,12 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
              }
              dict[i].setKey(key);
              dict[i].setValue(value);
+             dict[i].setUsed();
              numOfItems++;
+             //System.out.println(i);
+             //System.out.println(dict[i].getFlag());
+             //System.out.println(dict[i].getKey());
+             //System.out.println(dict[i].getValue());
          }
          return null;
      }
@@ -135,7 +140,6 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
              }
              dict[i].setKey(null);
              dict[i].setValue(null);
-             dict[i].setRemoved();
              numOfItems--;
              return tempVal;
          }
@@ -176,7 +180,7 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
              i = (i+1) % dict.length;
          }
          //loop exits when Node matches key, Node was unused, or reached original index
-         return key.equals(dict[i].getValue());
+         return key.equals(dict[i].getKey());
      }
    
      /** Creates an iterator that traverses all search keys in this dictionary.

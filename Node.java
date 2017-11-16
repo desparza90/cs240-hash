@@ -52,7 +52,7 @@ public class Node<K extends Comparable<? super K>,V> implements Comparable<Node<
     }
     
     /** Sets the node's flag to indicate data has been removed. */
-    public void setRemoved()
+    public void setUsed()
     {
         flag = true;
     }
