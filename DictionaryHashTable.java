@@ -7,20 +7,25 @@ import java.util.Iterator;
  */
 public class DictionaryHashTable<K extends Comparable<? super K>, V> implements DictionaryInterface<K, V>
 {
-    private Node<K, V>[] dict;
-    private int numOfItems;
+     private Node<K, V>[] dict;
+     private int numOfItems;
     
-    public DictionaryHashTable()
-    {
-        this(5); //default to 5
-    }
+     public DictionaryHashTable()
+     {
+         this(5); //default to 5
+     }
     
-    public DictionaryHashTable(int size)
-    {
-        @SuppressWarnings("unchecked")
-        Node<K, V>[] tempDict = (Node<K, V>[])new Object[size];
-        numOfItems = 0;
-    }
+     public DictionaryHashTable(int size)
+     {
+         @SuppressWarnings("unchecked")
+         Node<K, V>[] tempDict = (Node<K, V>[])new Object[size];
+         dict = tempDict;
+         for (int i=0; i<dict.length; i++)
+         {
+             dict[i] = new Node<K, V>(null, null); //fill dict with unused Nodes
+         }
+         numOfItems = 0;
+     }
     
      /** Adds a new entry to this dictionary. If the given search key already
        exists in the dictionary, replaces the corresponding value.
@@ -31,7 +36,7 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
                 was replaced. */
      public V add(K key, V value)
      {
-        return null; //todo
+         return null; //todo
      }
    
      /** Removes a specific entry from this dictionary.
@@ -40,7 +45,7 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
                 or null if no such object exists. */
      public V remove(K key)
      {
-        return null; //todo
+         return null; //todo
      }
    
      /** Retrieves from this dictionary the value associated with a given
@@ -66,7 +71,7 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
                 keys in the dictionary. */
      public Iterator<K> getKeyIterator()
      {
-        return null; //todo
+         return null; //todo
      }
    
      /** Creates an iterator that traverses all values in this dictionary.
@@ -74,7 +79,7 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
                 in this dictionary. */
      public Iterator<V> getValueIterator()
      {
-        return null; //todo
+         return null; //todo
      }
    
      /** Sees whether this dictionary is empty.
@@ -95,6 +100,12 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
      /** Removes all entries from this dictionary. */
      public void clear()
      {
-         
+         for (int i=0; i<dict.length; i++)
+         {
+             dict[i].setKey(null);
+             dict[i].setValue(null);
+             dict[i].setUnused();
+             numOfItems = 0;
+         }
      }
 }
