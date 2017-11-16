@@ -59,6 +59,27 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
          return newSize;
      }
      
+     /** Resizes the dictionary to the next prime number at least twice current size. */
+     public void resizeDict()
+     {
+         Node<K, V>[] tempDict = dict;
+         @SuppressWarnings("unchecked")
+         Node<K, V>[] newDict = (Node<K, V>[])new Node<?,?>[nextPrime()];
+         for (int i=0; i<newDict.length; i++)
+         {
+             newDict[i] = new Node<K, V>(null, null);
+         }
+         dict = newDict;
+         numOfItems = 0;
+         for (int i=0; i<tempDict.length; i++)
+         {
+             if (tempDict[i].getKey() != null)
+             {
+                 add(tempDict[i].getKey(), tempDict[i].getValue()); //add all old nodes to new, bigger dict
+             }
+         }
+     }
+     
      /** Adds a new entry to this dictionary. If the given search key already
        exists in the dictionary, replaces the corresponding value.
        @param key    An object search key of the new entry.
@@ -72,30 +93,16 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
          {
              V tempVal = getValue(key);
              int i = index(key);
-             while (!dict[i].getKey().equals(key)) //while Node not same key
+             while (!key.equals(dict[i].getKey())) //while Node not same key
              {
-                 i = i+1 % dict.length;
+                 i = (i+1) % dict.length;
              }
              dict[i].setValue(value);
              return tempVal;
          }
          else if (numOfItems == dict.length) //if dict full, resize, then add
          {
-             Node<K, V>[] tempDict = dict;
-             @SuppressWarnings("unchecked")
-             Node<K, V>[] newDict = (Node<K, V>[])new Node<?,?>[nextPrime()];
-             for (int i=0; i<newDict.length; i++)
-             {
-                 newDict[i] = new Node<K, V>(null, null);
-             }
-             dict = newDict;
-             for (int i=0; i<tempDict.length; i++)
-             {
-                 if (tempDict[i].getKey() != null)
-                 {
-                     add(tempDict[i].getKey(), tempDict[i].getValue()); //add all old nodes to new, bigger dict
-                 }
-             }
+             resizeDict();
              add(key, value);
          }
          else //key not inside and dict not full, so add
@@ -103,7 +110,7 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
              int i = index(key);
              while (dict[i].getKey() != null) //while Node not open
              {
-                 i = i+1 % dict.length;
+                 i = (i+1) % dict.length;
              }
              dict[i].setKey(key);
              dict[i].setValue(value);
@@ -122,9 +129,9 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
          {
              V tempVal = getValue(key);
              int i = index(key);
-             while (!dict[i].getKey().equals(key) && dict[i].getFlag())
+             while (!key.equals(dict[i].getKey()) && dict[i].getFlag())
              {
-                 i = i+1 % dict.length;
+                 i = (i+1) % dict.length;
              }
              dict[i].setKey(null);
              dict[i].setValue(null);
@@ -145,9 +152,9 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
          if (contains(key))
          {
              int i = index(key);
-             while (!dict[i].getKey().equals(key) && dict[i].getFlag()) //while Node not matching and Node has been used, increment index
+             while (!key.equals(dict[i].getKey()) && dict[i].getFlag()) //while Node not matching and Node has been used, increment index
              {
-                 i = i+1 % dict.length;
+                 i = (i+1) % dict.length;
              }
              return dict[i].getValue();
          }
@@ -164,12 +171,12 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
              return false;
          }
          int i = index(key);
-         while (!dict[i].getKey().equals(key) && dict[i].getFlag() && i+1 != index(key))
+         while (!key.equals(dict[i].getKey()) && dict[i].getFlag() && (i+1) != index(key))
          {
-             i = i+1 % dict.length;
+             i = (i+1) % dict.length;
          }
          //loop exits when Node matches key, Node was unused, or reached original index
-         return dict[i].getKey().equals(key);
+         return key.equals(dict[i].getValue());
      }
    
      /** Creates an iterator that traverses all search keys in this dictionary.
