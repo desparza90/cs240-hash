@@ -84,12 +84,16 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
              Node<K, V>[] tempDict = dict;
              @SuppressWarnings("unchecked")
              Node<K, V>[] newDict = (Node<K, V>[])new Node<?,?>[nextPrime()];
-             dict = newDict;
-             for (int i=0; i<dict.length; i++)
+             for (int i=0; i<newDict.length; i++)
              {
-                 if (dict[i].getKey() != null)
+                 newDict[i] = new Node<K, V>(null, null);
+             }
+             dict = newDict;
+             for (int i=0; i<tempDict.length; i++)
+             {
+                 if (tempDict[i].getKey() != null)
                  {
-                     add(dict[i].getKey(), dict[i].getValue()); //add all nodes to new, bigger dict
+                     add(tempDict[i].getKey(), tempDict[i].getValue()); //add all old nodes to new, bigger dict
                  }
              }
              add(key, value);
@@ -117,7 +121,15 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
          if (contains(key))
          {
              V tempVal = getValue(key);
-             //todo remove data, set flag
+             int i = index(key);
+             while (!dict[i].getKey().equals(key) && dict[i].getFlag())
+             {
+                 i = i+1 % dict.length;
+             }
+             dict[i].setKey(null);
+             dict[i].setValue(null);
+             dict[i].setRemoved();
+             numOfItems--;
              return tempVal;
          }
          return null;
@@ -133,7 +145,7 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
          if (contains(key))
          {
              int i = index(key);
-             while (dict[i].getKey() != null && dict[i].getFlag()) //while Node not open and Node has been used, increment index
+             while (!dict[i].getKey().equals(key) && dict[i].getFlag()) //while Node not matching and Node has been used, increment index
              {
                  i = i+1 % dict.length;
              }
@@ -147,6 +159,10 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
        @return  True if key is associated with an entry in the dictionary. */
      public boolean contains(K key)
      {
+         if (isEmpty())
+         {
+             return false;
+         }
          int i = index(key);
          while (!dict[i].getKey().equals(key) && dict[i].getFlag() && i+1 != index(key))
          {
