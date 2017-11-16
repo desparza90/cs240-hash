@@ -1,14 +1,16 @@
 import java.util.Iterator;
 /**
- * A dictionary using an array of nodes with key-value pair and makes use of hasing for indexing.
+ * A dictionary using an array of nodes with key-value pair and makes use of hashing for indexing.
  *
  * @author Daniel J. Norment
+ * @author Daniel Esparza
  * @version 1.0
  */
 public class DictionaryHashTable<K extends Comparable<? super K>, V> implements DictionaryInterface<K, V>
 {
      private Node<K, V>[] dict;
      private int numOfItems;
+     private int nSize;
     
      public DictionaryHashTable()
      {
@@ -18,7 +20,7 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
      public DictionaryHashTable(int size)
      {
          @SuppressWarnings("unchecked")
-         Node<K, V>[] tempDict = (Node<K, V>[])new Object[size];
+         Node<K, V>[] tempDict = (Node<K, V>[])new Node<?,?>[size];
          dict = tempDict;
          for (int i=0; i<dict.length; i++)
          {
@@ -36,7 +38,26 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
                 was replaced. */
      public V add(K key, V value)
      {
-         return null; //todo
+         int hash = key.hashCode() % dict.length;
+         Node tNode = new Node(key, value);
+         //while loop to incriment hash until hash fully loops and finds the open spot 
+         while(numOfItems < dict.length)
+         {
+            // if there is no node at all simply add
+             if(numOfItems == 0)
+             {
+                 dict[hash] = tNode;
+                 numOfItems++;
+                 return null;
+             }
+         }
+         // if array is full, double size and attempt to find next prime
+         if(numOfItems == dict.length)
+         {
+             nSize = dict.length * 2;
+             // next prime number found here and new array created
+         }
+         return null;
      }
    
      /** Removes a specific entry from this dictionary.
@@ -45,7 +66,16 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
                 or null if no such object exists. */
      public V remove(K key)
      {
-         return null; //todo
+         int hash = key.hashCode() % dict.length;
+         if(dict[hash] != null && dict[hash].getValue() != null)
+         {
+             V tVal = dict[hash].getValue();
+             dict[hash].setKey(null);
+             dict[hash].setValue(null);
+             dict[hash].setRemoved();
+             return tVal;
+         }
+         return null;
      }
    
      /** Retrieves from this dictionary the value associated with a given
@@ -63,7 +93,8 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
        @return  True if key is associated with an entry in the dictionary. */
      public boolean contains(K key)
      {
-         return true; //todo
+         int hash = key.hashCode() % dict.length;
+         return (dict[hash] != null && dict[hash].getValue() != null);
      }
    
      /** Creates an iterator that traverses all search keys in this dictionary.
