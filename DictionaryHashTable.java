@@ -114,14 +114,11 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
                 or null if no such object exists. */
      public V remove(K key)
      {
-         int hash = key.hashCode() % dict.length;
-         if(dict[hash] != null && dict[hash].getValue() != null)
+         if (contains(key))
          {
-             V tVal = dict[hash].getValue();
-             dict[hash].setKey(null);
-             dict[hash].setValue(null);
-             dict[hash].setRemoved();
-             return tVal;
+             V tempVal = getValue(key);
+             //todo remove data, set flag
+             return tempVal;
          }
          return null;
      }
@@ -133,7 +130,16 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
                 or null if no such object exists. */
      public V getValue(K key)
      {
-         return null; //todo
+         if (contains(key))
+         {
+             int i = index(key);
+             while (dict[i].getKey() != null && dict[i].getFlag()) //while Node not open and Node has been used, increment index
+             {
+                 i = i+1 % dict.length;
+             }
+             return dict[i].getValue();
+         }
+         return null;
      }
    
      /** Sees whether a specific entry is in this dictionary.
@@ -141,8 +147,13 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
        @return  True if key is associated with an entry in the dictionary. */
      public boolean contains(K key)
      {
-         int hash = key.hashCode() % dict.length;
-         return (dict[hash] != null && dict[hash].getValue() != null);
+         int i = index(key);
+         while (!dict[i].getKey().equals(key) && dict[i].getFlag() && i+1 != index(key))
+         {
+             i = i+1 % dict.length;
+         }
+         //loop exits when Node matches key, Node was unused, or reached original index
+         return dict[i].getKey().equals(key);
      }
    
      /** Creates an iterator that traverses all search keys in this dictionary.
