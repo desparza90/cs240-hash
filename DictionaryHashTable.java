@@ -1,9 +1,11 @@
+import java.util.ArrayList;
 import java.util.Iterator;
 /**
  * A dictionary using an array of nodes with key-value pair and makes use of hashing for indexing.
  *
  * @author Daniel J. Norment
  * @author Daniel Esparza
+ * @author Lutfi Haji-Cheteh
  * @version 1.0
  */
 public class DictionaryHashTable<K extends Comparable<? super K>, V> implements DictionaryInterface<K, V>
@@ -54,7 +56,7 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
          int newSize = dict.length * 2 + 1;
          while (!isPrime(newSize))
          {
-             newSize++;
+             newSize++;			//if not prime, keep incrementing until prime
          }
          return newSize;
      }
@@ -64,18 +66,18 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
      {
          Node<K, V>[] tempDict = dict;
          @SuppressWarnings("unchecked")
-         Node<K, V>[] newDict = (Node<K, V>[])new Node<?,?>[nextPrime()];
+         Node<K, V>[] newDict = (Node<K, V>[])new Node<?,?>[nextPrime()]; 	//make new array of next prime at least twice the size
          for (int i=0; i<newDict.length; i++)
          {
-             newDict[i] = new Node<K, V>(null, null);
+             newDict[i] = new Node<K, V>(null, null);		//populating new array with unused nodes
          }
          dict = newDict;
-         numOfItems = 0;
+         numOfItems = 0;		//reset size, otherwise old items counts as two
          for (int i=0; i<tempDict.length; i++)
          {
              if (tempDict[i].getKey() != null)
              {
-                 add(tempDict[i].getKey(), tempDict[i].getValue()); //add all old nodes to new, bigger dict
+                 add(tempDict[i].getKey(), tempDict[i].getValue()); //add all old nodes to new, bigger dict if not empty
              }
          }
      }
@@ -95,7 +97,7 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
              int i = index(key);
              while (!key.equals(dict[i].getKey())) //while Node not same key
              {
-                 i = (i+1) % dict.length;
+                 i = (i+1) % dict.length;		//increments index by one while making sure there's no out of bounds index
              }
              dict[i].setValue(value);
              return tempVal;
@@ -116,10 +118,6 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
              dict[i].setValue(value);
              dict[i].setUsed();
              numOfItems++;
-             //System.out.println(i);
-             //System.out.println(dict[i].getFlag());
-             //System.out.println(dict[i].getKey());
-             //System.out.println(dict[i].getValue());
          }
          return null;
      }
@@ -134,9 +132,9 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
          {
              V tempVal = getValue(key);
              int i = index(key);
-             while (!key.equals(dict[i].getKey()) && dict[i].getFlag())
+             while (!key.equals(dict[i].getKey()) && dict[i].getFlag())	//while key doesn't match and node has been used
              {
-                 i = (i+1) % dict.length;
+                 i = (i+1) % dict.length;		//exits while that is not true
              }
              dict[i].setKey(null);
              dict[i].setValue(null);
@@ -188,7 +186,13 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
                 keys in the dictionary. */
      public Iterator<K> getKeyIterator()
      {
-         return null; //todo
+         ArrayList<K> keyList = new ArrayList<K>();
+         for(int i=0; i<dict.length; i++){
+        	 if (dict[i].getKey() != null){
+        		 keyList.add(dict[i].getKey());
+        	 }
+         }
+         return keyList.iterator();
      }
    
      /** Creates an iterator that traverses all values in this dictionary.
@@ -196,7 +200,13 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
                 in this dictionary. */
      public Iterator<V> getValueIterator()
      {
-         return null; //todo
+    	 ArrayList<V> valueList = new ArrayList<V>();
+         for(int i=0; i<dict.length; i++){
+        	 if (dict[i].getValue() != null){
+        		 valueList.add(dict[i].getValue());
+        	 }
+         }
+         return valueList.iterator();
      }
    
      /** Sees whether this dictionary is empty.
@@ -222,7 +232,7 @@ public class DictionaryHashTable<K extends Comparable<? super K>, V> implements 
              dict[i].setKey(null);
              dict[i].setValue(null);
              dict[i].setUnused();
-             numOfItems = 0;
          }
+         numOfItems = 0;
      }
 }
